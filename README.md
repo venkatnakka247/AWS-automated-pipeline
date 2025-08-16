@@ -1,4 +1,4 @@
-#Automated Pipeline
+# Automated Pipeline
 ![Project architecture](/awsproj.png)
 The project you have is an automated data processing pipeline utilizing AWS managed services. It orchestrates the entire workflow from data ingestion to notification using serverless and event-driven architecture.
 
