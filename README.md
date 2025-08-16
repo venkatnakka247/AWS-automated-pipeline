@@ -1,6 +1,6 @@
 #Automated Pipeline
 ![Project architecture](/awsproj.png)
-This project orchestrates a data processing workflow using various AWS services, illustrated in the attached architecture diagram.
+The project you have is an automated data processing pipeline utilizing AWS managed services. It orchestrates the entire workflow from data ingestion to notification using serverless and event-driven architecture.
 
 Architecture Overview
 The pipeline consists of the following components:
