@@ -1,0 +1,61 @@
+import sys
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from awsglue.dynamicframe import DynamicFrame
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from awsglue.job import Job
+from pyspark.sql.functions import col, month, to_date, sum as _sum
+
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+glueContext = GlueContext(SparkContext.getOrCreate())
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+
+# Read CSV from S3
+orders_dyf = glueContext.create_dynamic_frame.from_options(
+    connection_type="s3",
+    connection_options={"paths": ["s3://automatedetlbucket2/extract/prodd.csv"]},
+    format="csv",
+    format_options={"withHeader": True, "separator": ",", "quoteChar": "\""},
+    transformation_ctx="orders_dyf"
+)
+
+# Convert to DataFrame
+orders_df = orders_dyf.toDF()
+
+# Add TotalAmount column
+orders_df = orders_df.withColumn(
+    "TotalAmount", col("Quantity").cast("double") * col("PricePerUnit").cast("double")
+)
+
+# Filter orders
+orders_df = orders_df.filter(col("TotalAmount") > 200)
+
+# Extract OrderMonth
+orders_df = orders_df.withColumn(
+    "OrderMonth", month(to_date(col("OrderDate"), "yyyy-MM-dd"))
+)
+
+# Group by Product and OrderMonth
+grouped_df = orders_df.groupBy("Product", "OrderMonth") \
+    .agg(
+        _sum("Quantity").alias("TotalQuantity"),
+        _sum("TotalAmount").alias("TotalSales")
+    )
+
+# Sort by TotalSales descending
+sorted_df = grouped_df.orderBy(col("TotalSales").desc())
+
+# Convert back to DynamicFrame and write to S3
+sorted_dyf = DynamicFrame.fromDF(sorted_df.coalesce(1), glueContext, "sorted_dyf")
+
+glueContext.write_dynamic_frame.from_options(
+    frame=sorted_dyf,
+    connection_type="s3",
+    connection_options={"path": "s3://automatedetlbucket2/load/", "partitionKeys": []},
+    format="csv"
+)
+
+job.commit()
