@@ -2,7 +2,7 @@
 ![Project architecture](/awsproj.png)
 The project you have is an automated data processing pipeline utilizing AWS managed services. It orchestrates the entire workflow from data ingestion to notification using serverless and event-driven architecture.
 
-Architecture Overview
+### Architecture Overview
 The pipeline consists of the following components:
 
 S3 (Simple Storage Service)
@@ -39,7 +39,7 @@ Centralized monitoring and logging for all pipeline components.
 
 Collects metrics, logs, and sends alerts for failures or anomalies.
 
-Workflow Steps
+### Workflow Steps
 File Upload
 
 User uploads a file/data to the designated S3 bucket.
@@ -72,7 +72,7 @@ Every service logs activities and errors to CloudWatch.
 
 Setup CloudWatch alarms as needed.
 
-Setup Guide
+### Setup Guide
 S3 Bucket
 
 Create an S3 bucket for storing input files.
@@ -109,7 +109,7 @@ Enable logging for Lambda, Glue, EventBridge, and SNS.
 
 Create CloudWatch alarms for errors or anomalies.
 
-Prerequisites
+### Prerequisites
 An AWS Account
 
 IAM roles with appropriate permissions for S3, Lambda, Glue, EventBridge, SNS, and CloudWatch
