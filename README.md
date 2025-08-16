@@ -1,5 +1,5 @@
 #Automated Pipeline
-![Alt text](awsproj)
+![Project architecture](/awsproj.png)
 This project orchestrates a data processing workflow using various AWS services, illustrated in the attached architecture diagram.
 
 Architecture Overview
